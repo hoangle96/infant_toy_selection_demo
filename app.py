@@ -13,7 +13,7 @@ st.title('Demo UI for Infants\' toy selection behaviors')
 subjects_list = [26, 28, 30, 31, 33, 34, 38, 48, 49, 51, 53, 58, 59, 66, 80, 25, 37, 69, 70, 84]
 n_states = st.sidebar.slider("Number of states", 2, 6, 5, 1)
 window_sizes = st.sidebar.slider("Window sizes", 1., 2.5, 2., 0.5)
-subject_n = st.sidebar.multiselect("Subject IDs", subjects_list)
+subject_n = st.sidebar.multiselect("Subject IDs", subjects_list, default=[80])
 features_name_list = ["# Switch", "# toys", "# new toys", "dom toy ratio", "toy IOU"]
 feature_list_multiselect = st.sidebar.multiselect('features list', features_name_list, default=features_name_list)
 shift_time_dict = {1:{0, 0.5}, 1.5:{0, 0.5, 1}, 2:[0,0.5,1,1.5], 2.5:[0,0.5,1,1.5, 2], 3:[0,0.5,1,1.5, 2, 2.5]}
