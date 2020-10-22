@@ -2,5 +2,5 @@ numpy==1.19.1
 streamlit==0.69.2
 plotly==4.11.0
 matplotlib==3.3.2
-pomegranate==0.13.5
+pomegranate==0.13.4
 scipy
