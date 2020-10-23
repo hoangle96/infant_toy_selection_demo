@@ -41,6 +41,7 @@ def draw_distribution(n_states, feature_vector, feature_names, pred, feature_lab
 
 def draw_merged_timeline(k, merged_df_dict, state_list, time_list):
     df = merged_df_dict[k].copy()
+    df['toy'] = df['toy'].replace({'no_ops':"no_toy"})
 
     begin_time = df.iloc[0,:]
     begin_time = begin_time.loc['onset_mil']
@@ -60,7 +61,7 @@ def draw_merged_timeline(k, merged_df_dict, state_list, time_list):
             marker=dict(color='rgba(131, 90, 241, 0)')
         )
 
-    colors_dict = {'bucket':'orange', 'broom': 'blue', 'doll':'red', 'mom':'green', 'popper':'yellow', 'redball':'purple', 'stroller':'aqua', 'no_ops':'skyblue'}
+    colors_dict = {'bucket':'orange', 'broom': 'blue', 'doll':'red', 'mom':'green', 'popper':'yellow', 'redball':'purple', 'stroller':'aqua', 'no_toy':'skyblue'}
     state_color_dict = {0:'blue', 1:'green', 2:'purple', 3:'red', 4:'yellow', 5:'chocolate', 6:'crimson', 7:'darkolivegreen'}
     
     # draw plain timeline 
@@ -112,14 +113,15 @@ def draw_merged_timeline(k, merged_df_dict, state_list, time_list):
     fig = go.Figure([data1, data2],layout)
     fig.update_layout(xaxis = dict(
             tickmode = 'linear',
-            tick0 = 0.5,
-            dtick = 0.5
+            tick0 = 0,
+            dtick = 2
         ), annotations=[
-            dict(
-                x=(time_list[m])/60000,
-                y=6,
-                text= str(state_list[m]),
-            ) for m in range(len(time_list))])
-
-    fig.update_layout(yaxis_type='category', showlegend=False)
+                dict(
+                    x=(time_list[m])/60000,
+                    y=6,
+                    text= str(state_list[m]),
+                ) for m in range(len(time_list))], 
+        xaxis_title="Time (min)",
+        yaxis_title="Toys",
+        yaxis_type='category', showlegend=False)
     return fig

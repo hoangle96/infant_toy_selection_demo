@@ -14,7 +14,7 @@ subjects_list = [26, 28, 30, 31, 33, 34, 38, 48, 49, 51, 53, 58, 59, 66, 80, 25,
 n_states = st.sidebar.slider("Number of states", 2, 6, 5, 1)
 window_sizes = st.sidebar.slider("Window sizes", 1., 2.5, 2., 0.5)
 subject_n = st.sidebar.multiselect("Subject IDs", subjects_list, default=[80])
-features_name_list = ["# Switch", "# toys", "# new toys", "dom toy ratio", "toy IOU"]
+features_name_list = ["# toy switches", "# toys", "# new toys", "fav toy ratio", "toy IOU"]
 feature_list_multiselect = st.sidebar.multiselect('features list', features_name_list, default=features_name_list)
 shift_time_dict = {1:{0, 0.5}, 1.5:{0, 0.5, 1}, 2:[0,0.5,1,1.5], 2.5:[0,0.5,1,1.5, 2], 3:[0,0.5,1,1.5, 2, 2.5]}
 
@@ -29,7 +29,10 @@ def main():
     
     labels = get_features_x_labels(feature_dict, window_sizes)
     fig, _ = draw_distribution(n_states, feature_vector, feature_list_multiselect, np.array(pred_list), labels)
+    st.write("Emission distribution for model with window size of "+ str(window_sizes)+" minute(s), " + str(n_states) + " states, and " + str(len(feature_list_multiselect)) + " features")
     st.pyplot(fig)
+
+    st.write("Individual state trajectories")
 
     plotly_list = get_subject_timeline(subject_n, merged_data_dict, state_merged_general, time_merged_general)
     for plot in plotly_list:
@@ -65,19 +68,19 @@ def get_features(feature_list_multiselect, features_name_list, window_sizes):
 
     return new_features_list, feature_vector, feature_dict
 
-@st.cache()
+@st.cache(show_spinner=False)
 def fit_model(n_states, features_list, feature_vector):
     model = hmm.init_hmm(n_components = n_states, feature_list = feature_vector.T, seed = 0)
     model.bake()
     model.fit(features_list)
     return model
 
-@st.cache()
+@st.cache(show_spinner=False)
 def load_original_dataset():
     with open(Path('./data/annotated_episode_dict_20200904.pickle'), 'rb') as f:
         return pickle.load(f) 
     
-@st.cache()
+@st.cache(show_spinner=False)
 def load_time_arr_dict(window_size):
     with open(Path('./data/time_arr_dict_'+str(window_size)+'.pickle'), 'rb') as f:
         return pickle.load(f) 
@@ -87,7 +90,7 @@ def check_window_size_int(window_size):
         window_size = int(window_size) if window_size.is_integer() else window_size
     return window_size
 
-@st.cache()
+@st.cache(show_spinner=False)
 def get_prediction(model, list_seq, subjects_list, window_size, shift_time_dict, merged_df_dict):
     pred_list = []
     proba_list = []
@@ -139,13 +142,13 @@ def get_features_x_labels(feature_dict, window_size):
     ep_rate_dict = {1:[0, 2, 4, 6, 8], 1.5: [0, 3, 6, 9, 12], 2:[0, 3, 6, 9, 12], 2.5: [0, 4, 8, 12, 16], 3: [0, 5, 10, 15, 20]}
 
     for f_i in feature_dict.keys():
-        if "# Switch" == f_i:
+        if "# toy switches" == f_i:
             labels.append(ep_rate_dict[window_size])
         elif "# toys" == f_i:
             labels.append(np.unique(feature_dict[f_i]))
         elif "# new toys" == f_i:
             labels.append(np.unique(feature_dict[f_i]))
-        elif "dom toy ratio" == f_i:
+        elif "fav toy ratio" == f_i:
             labels.append([0, .2, .4, .6, .8])
         elif "toy IOU" == f_i:
             labels.append([0, .2, .4, .6, .8])
